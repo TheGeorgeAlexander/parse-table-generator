@@ -1,0 +1,8 @@
+{
+  "name": "parse-table-generator",
+  "main": "src/generate.js",
+  "scripts": {
+    "generate": "node ."
+  },
+  "type": "module"
+}

@@ -26,5 +26,5 @@ Then the grammar would accept lines like this:
 ## How to use
 1. Clone this repo
 2. Create a text file with your context-free grammar. The format of the text file is defined in the paragraph above.
-3. Run the generator with `npm run generate <path to grammar file>`.
+3. Run the generator with `node . <path to grammar file>`.
 4. The LR(0) parse table will be generated and displayed in the terminal as output.

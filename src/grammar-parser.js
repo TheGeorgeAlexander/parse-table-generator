@@ -1,7 +1,7 @@
 /**
  * Parses the grammar text file into an array of JSON objects of the productions
  * @param {String} fileContent The content of the grammar text file
- * @returns {Array<JSON>|null} An array of production objects or null on error
+ * @returns {Array<Object>|null} An array of production objects or null on error
  */
 export default function parseGrammar(fileContent) {
     const lines = fileContent.split("\n");
@@ -21,32 +21,43 @@ export default function parseGrammar(fileContent) {
             return null;
         }
 
-        const productionRule = {
-            leftHandSide: tokens[0],
-            rightHandSide: [],
-            lineNum: i + 1
+        let productionRule = {
+            leftHandSide: {
+                name: tokens[0],
+                isTerminal: false
+            },
+            rightHandSide: []
         }
 
-        let rightHandProduction = [];
         for(let j = 2; j < tokens.length; j++) {
             const token = tokens[j];
             if(token == "|") {
-                productionRule.rightHandSide.push(rightHandProduction);
-                rightHandProduction = [];
+                productions.push(productionRule);
+                productionRule = {
+                    leftHandSide: {
+                        name: tokens[0],
+                        isTerminal: false
+                    },
+                    rightHandSide: []
+                };
+
             } else if(isValidTerminalOrNonTerminal(token)) {
-                rightHandProduction.push(token);
+                productionRule.rightHandSide.push({
+                    name: token,
+                    isTerminal: !isValidNonTerminal(token)
+                });
+
             } else {
                 console.error(`'${token}' is an invalid (non-)terminal on right hand side in the production rule on line ${i + 1}`);
                 return null;
             }
         }
 
-        if(rightHandProduction.length == 0) {
+        if(productionRule.rightHandSide.length == 0) {
             console.error(`Malformed production rule on line ${i + 1}`);
             return null;
         }
 
-        productionRule.rightHandSide.push(rightHandProduction);
         productions.push(productionRule);
     }
 
@@ -84,7 +95,7 @@ function isPossiblyValidRule(tokens, lineNum) {
  * @returns {Boolean} Whether it's a valid terminal or non-terminal
  */
 function isValidTerminalOrNonTerminal(word) {
-    return isValidNonTerminal(word) || /^[A-Z]+$/.test(word);
+    return isValidNonTerminal(word) || /^[a-z]+$/.test(word) || word == "*";
 }
 
 
@@ -95,5 +106,5 @@ function isValidTerminalOrNonTerminal(word) {
  * @returns {Boolean} Whether it's a valid non-terminal
  */
 function isValidNonTerminal(word) {
-    return /^[a-z]+$/.test(word);
+    return /^[A-Z]+$/.test(word);
 }

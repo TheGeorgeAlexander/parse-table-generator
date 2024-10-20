@@ -1,5 +1,5 @@
 {
   "name": "parse-table-generator",
-  "main": "src/generate.js",
+  "main": "src/index.js",
   "type": "module"
 }

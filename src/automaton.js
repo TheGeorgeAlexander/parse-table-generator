@@ -1,7 +1,7 @@
 /**
- * Creates a map that represents the LR(1) automaton of the production rules
+ * Creates an array that represents the LR(1) automaton of the production rules
  * @param {Array<Object>} productions An array of production rules
- * @returns {Map<Number, Object>} A map where the keys are indices for transitions and values are the states
+ * @returns {Array<Object>} An array of states representing the automaton
  */
 export default function createAutomaton(productions) {
     // Generate the FIRST set and turn all Sets into arrays

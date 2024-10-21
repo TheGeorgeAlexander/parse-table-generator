@@ -11,6 +11,11 @@ export default function createAutomaton(productions) {
         FIRST[key] = Array.from(FIRSTWithSets[key]);
     }
 
+    // Remove all epsilons from the rules
+    for(const production of productions) {
+        production.rightHandSide = production.rightHandSide.filter(rule => rule.name != "*");
+    }
+
     // Create augmented grammar
     productions.unshift({
         leftHandSide: {
@@ -147,6 +152,11 @@ function createClosure(initialProduction, allProductions, FIRST) {
     while(toProcessQueue.length > 0) {
         const currentRule = toProcessQueue.shift();
         const currentSymbol = currentRule.rightHandSide[currentRule.dotIndex];
+
+        // Don't do anything if there isn't a symbol at the dotIndex
+        if(!currentSymbol) {
+            continue;
+        }
 
         // Check if the symbol at the dot index is a non-terminal
         if(!currentSymbol.isTerminal) {

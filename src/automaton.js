@@ -50,7 +50,29 @@ export default function createAutomaton(productions) {
         mergedStates = mergeAutomaton(automaton);
     }
 
-    return automaton;
+    // The state indices may have gaps between them now, so map them to normal indices
+    const indexMap = {};
+    let nextIndex = 0;
+    for(let i = 0; i < automaton.size; i++) {
+        while(!automaton.has(nextIndex)) {
+            nextIndex++;
+        }
+        indexMap[nextIndex] = i;
+        nextIndex++;
+    }
+
+    // Convert the Map automaton to an array, transitions will use the map for indexing
+    const finalAutomaton = [];
+    automaton.forEach((state, key) => {
+        state.transitions = state.transitions.map(transition => {
+            transition.closureIndex = indexMap[transition.closureIndex];
+            return transition;
+        });
+        finalAutomaton[indexMap[key]] = state;
+    });
+
+
+    return finalAutomaton;
 }
 
 

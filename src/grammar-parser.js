@@ -7,6 +7,8 @@ export default function parseGrammar(fileContent) {
     const lines = fileContent.split("\n");
     const productions = [];
 
+    const nonTerminals = new Set();
+
     for(let i = 0; i < lines.length; i++) {
         const line = lines[i];
 
@@ -21,14 +23,17 @@ export default function parseGrammar(fileContent) {
             return null;
         }
 
+        nonTerminals.add(tokens[0]);
         let productionRule = {
             leftHandSide: {
                 name: tokens[0],
                 isTerminal: false
             },
-            rightHandSide: []
+            rightHandSide: [],
+            line: i + 1
         }
 
+        // Go through the tokens of the production to build the right-hand side
         for(let j = 2; j < tokens.length; j++) {
             const token = tokens[j];
             if(token == "|") {
@@ -38,7 +43,8 @@ export default function parseGrammar(fileContent) {
                         name: tokens[0],
                         isTerminal: false
                     },
-                    rightHandSide: []
+                    rightHandSide: [],
+                    line: i + 1
                 };
 
             } else if(isValidTerminalOrNonTerminal(token)) {
@@ -59,6 +65,17 @@ export default function parseGrammar(fileContent) {
         }
 
         productions.push(productionRule);
+    }
+
+    // Check if all non-terminals on the right-hand side actually resolve to a production
+    for(const production of productions) {
+        for(const symbol of production.rightHandSide) {
+            if(!symbol.isTerminal && !nonTerminals.has(symbol.name)) {
+                console.error(`There is no production rule for non-terminal '${symbol.name}' on line ${production.line}`);
+                return null;
+            }
+        }
+        delete production.line;
     }
 
     return productions;

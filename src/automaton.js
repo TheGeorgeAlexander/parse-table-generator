@@ -60,7 +60,7 @@ function generateFIRST(productions) {
     
     // Initialize FIRST sets for each non-terminal
     for(const producution of productions) {
-        if (!FIRST[producution.leftHandSide.name]) {
+        if (!(producution.leftHandSide.name in FIRST)) {
             FIRST[producution.leftHandSide.name] = new Set();
         }
     }

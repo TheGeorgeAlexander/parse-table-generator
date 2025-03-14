@@ -50,7 +50,7 @@ export default function createAutomaton(productions) {
         mergedStates = mergeAutomaton(automaton);
     }
 
-    // The state indices may have gaps between them now, so map them to normal indices
+    // The state indices may have gaps between them now, so map them to consecutive indices
     const indexMap = {};
     let nextIndex = 0;
     for(let i = 0; i < automaton.size; i++) {
@@ -61,7 +61,7 @@ export default function createAutomaton(productions) {
         nextIndex++;
     }
 
-    // Convert the Map automaton to an array, transitions will use the map for indexing
+    // Convert the Map automaton to an array, transitions will have their index updated
     const finalAutomaton = [];
     automaton.forEach((state, key) => {
         state.transitions = state.transitions.map(transition => {
@@ -328,6 +328,7 @@ function mergeAutomaton(automaton) {
                 // If the transition is pointing to the same state, just delete the transition
                 if(existingTransition.closureIndex == closureIndex) {
                     state.transitions.splice(transitionIndex, 1);
+                    mergedStates = true
                     return;
                 }
 
@@ -340,7 +341,7 @@ function mergeAutomaton(automaton) {
                 // Update all transitions in the automaton that pointed to the merged state (closureIndex)
                 automaton.forEach(state => {
                     state.transitions.forEach(transition => {
-                        if (transition.closureIndex === closureIndex) {
+                        if (transition.closureIndex == closureIndex) {
                             transition.closureIndex = existingTransition.closureIndex;
                         }
                     });

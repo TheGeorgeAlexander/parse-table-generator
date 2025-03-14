@@ -1,6 +1,7 @@
 import fs from "node:fs"
 import parseGrammar from "./grammar-parser.js";
 import createAutomaton from "./automaton.js";
+import createParseTable from "./table.js";
 
 
 
@@ -16,26 +17,8 @@ if(productions == null) {
 // Create the LR(1) automaton from the production rules
 const automaton = createAutomaton(productions);
 
-// Log the automaton as a DOT file
-let dotFile = "digraph G {\n    rankdir=\"LR\"\n    node [ shape=box ]\n";
-automaton.forEach((value, index) => {
-    dotFile += `    ${index} [ label="[${index}]\\n\\n${getClosureString(value).replace(/\n/g, "\\n")}" ]\n`;
-    for(const transition of value.transitions) {
-        dotFile += `    ${index} -> ${transition.closureIndex} [ label="${transition.value?.name}" ]\n`;
-    }
-});
-dotFile += "}";
-console.log(dotFile);
+// Create the actual parse table from the automaton
+const parseTable = createParseTable(automaton);
 
-
-
-
-function getClosureString(closure) {
-    let string = "";
-    for(const rule of closure.rules) {
-        let rightHandSide = [...rule.rightHandSide];
-        rightHandSide.splice(rule.dotIndex, 0, {name: "."});
-        string += rule.leftHandSide.name + " ---> " + rightHandSide.map(symbol => symbol.name).join(" ") + "    " + rule.lookAhead + "\n";
-    }
-    return string.trim();
-}
+// Print the parse table object
+console.log(JSON.stringify(parseTable, null, 4));

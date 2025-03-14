@@ -38,7 +38,7 @@ baa
 ## Parse table format
 The output of this program is an JSON array. Each element of this array is a row in the parse table.
 A row in the parse table has the following format:
-```
+```jsonc
 {
     // Each key is a column in this row
     "<SYMBOL>": {
